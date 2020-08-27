@@ -1,4 +1,4 @@
-FROM alpine as builder
+FROM curlimages/curl as builder
 ARG SKYWALKING_VERSION=8.1.0
 ARG BASE_URL=https://www.apache.org/dyn/closer.cgi/skywalking/${SKYWALKING_VERSION}/apache-skywalking-apm-es7-${SKYWALKING_VERSION}.tar.gz
 #ARG BASE_URL=https://mirrors.tuna.tsinghua.edu.cn/apache/skywalking/${SKYWALKING_VERSION}/apache-skywalking-apm-es7-${SKYWALKING_VERSION}.tar.gz
