@@ -1,5 +1,3 @@
-FROM ubuntu:20.04
+FROM centos:7
 
-RUN apt update && apt install -y sysbench \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/* \
+RUN yum install -y sysbench
