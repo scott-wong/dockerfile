@@ -12,6 +12,7 @@ if [ "$1" = 'mysqlsh' ]; then
 	    echo "to be set. Exiting."
 	    exit 1
     fi
+	sleep 10s
     max_tries=12
     attempt_num=0
     until (echo > "/dev/tcp/$MYSQL_HOST/$MYSQL_PORT") >/dev/null 2>&1; do

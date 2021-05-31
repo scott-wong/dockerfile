@@ -9,7 +9,6 @@ RUN rpmkeys --import $KEY \
     $MYSQL_SHELL_PACKAGE_URL \
   && yum clean all
 COPY run.sh /run.sh
-COPY wait-for-it.sh /wait-for-it.sh.sh
 
 ENTRYPOINT ["/run.sh"]
 CMD ["mysqlsh"]
