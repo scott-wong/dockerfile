@@ -1,0 +1,87 @@
+version: '3.9'
+services:
+  mysql-server-1:
+    env_file:
+      - mysql-server.env
+    image: mysql/mysql-server
+    command: ["mysqld","--server_id=1","--slave_parallel_type=LOGICAL_CLOCK","--slave_preserve_commit_order=ON","--binlog_transaction_dependency_tracking=WRITESET","--innodb_ft_min_token_size=1","--ft_min_word_len=1","--ngram_token_size=1","--binlog_checksum=NONE","--gtid_mode=ON","--enforce_gtid_consistency=ON","--log_bin","--log_slave_updates=ON","--master_info_repository=TABLE","--relay_log_info_repository=TABLE","--transaction_write_set_extraction=XXHASH64","--user=mysql","--skip-host-cache","--skip-name-resolve", "--default_authentication_plugin=mysql_native_password"]
+    volumes:
+      - mysql-1:/var/lib/mysql
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.hostname==eunitedtech1"
+    networks:
+      - mysql
+  mysql-server-2:
+    env_file:
+      - mysql-server.env
+    image: mysql/mysql-server
+    command: ["mysqld","--server_id=2","--slave_parallel_type=LOGICAL_CLOCK","--slave_preserve_commit_order=ON","--binlog_transaction_dependency_tracking=WRITESET","--innodb_ft_min_token_size=1","--ft_min_word_len=1","--ngram_token_size=1","--binlog_checksum=NONE","--gtid_mode=ON","--enforce_gtid_consistency=ON","--log_bin","--log_slave_updates=ON","--master_info_repository=TABLE","--relay_log_info_repository=TABLE","--transaction_write_set_extraction=XXHASH64","--user=mysql","--skip-host-cache","--skip-name-resolve", "--default_authentication_plugin=mysql_native_password"]
+    volumes:
+      - mysql-2:/var/lib/mysql
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.hostname==eunitedtech2"
+    depends_on:
+      - mysql-server-1
+    networks:
+      - mysql
+  mysql-server-3:
+    env_file:
+      - mysql-server.env
+    image: mysql/mysql-server
+    command: ["mysqld","--server_id=3","--slave_parallel_type=LOGICAL_CLOCK","--slave_preserve_commit_order=ON","--binlog_transaction_dependency_tracking=WRITESET","--innodb_ft_min_token_size=1","--ft_min_word_len=1","--ngram_token_size=1","--binlog_checksum=NONE","--gtid_mode=ON","--enforce_gtid_consistency=ON","--log_bin","--log_slave_updates=ON","--master_info_repository=TABLE","--relay_log_info_repository=TABLE","--transaction_write_set_extraction=XXHASH64","--user=mysql","--skip-host-cache","--skip-name-resolve", "--default_authentication_plugin=mysql_native_password"]
+    volumes:
+      - mysql-3:/var/lib/mysql
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.hostname==eunitedtech3"
+    depends_on:
+      - mysql-server-1
+    networks:
+      - mysql
+  mysql-shell:
+    env_file:
+      - mysql-shell.env
+    image: registry.cn-hangzhou.aliyuncs.com/scottwong/mysql-shell
+    volumes:
+        - ./scripts/:/scripts/
+    depends_on:
+      - mysql-server-1
+      - mysql-server-2
+      - mysql-server-3
+    networks:
+      - mysql
+  mysql-router:
+    env_file:
+      - mysql-router.env
+    image: mysql/mysql-router
+    deploy:
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8004:6446"
+    depends_on:
+      - mysql-server-1
+      - mysql-server-2
+      - mysql-server-3
+      - mysql-shell
+    networks:
+      - mysql
+volumes:
+  mysql-1:
+  mysql-2:
+  mysql-3:
+networks:
+  mysql:
+    driver: overlay
+    #attachable: true
